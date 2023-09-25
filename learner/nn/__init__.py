@@ -2,15 +2,12 @@ import os
 
 from utils import count_parameters, load_network
 
-from .baseline import Baseline
-from .pi_r_nn import PIRNN
+
 from .pinn import PINN
 
 
 __model_factory = {
     "PINN": PINN,
-    "Baseline": Baseline,
-    "PIRNN": PIRNN,
 }
 
 
