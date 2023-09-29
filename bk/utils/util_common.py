@@ -1,5 +1,4 @@
 import importlib
-import pickle
 import random
 import time
 from functools import wraps
@@ -36,7 +35,7 @@ def tensors_to_numpy(*tensors):
     """
     if len(tensors) == 1:
         return tensors[0].cpu().detach().numpy()
-
+    
     np_arrays = tuple()
     for tensor in tensors:
         if isinstance(tensor, torch.Tensor):
@@ -48,7 +47,6 @@ def tensors_to_numpy(*tensors):
         else:
             raise ValueError("Input must be either a PyTorch tensor or a NumPy array.")
     return np_arrays
-
 
 class lazy_property:
     def __init__(self, func):
@@ -80,7 +78,12 @@ def timing(func):
     def wrapper(*args, **kwargs):
         t = time.time()
         result = func(*args, **kwargs)
-        print("'" + func.__name__ + "'" + " took {:.2f} minute ".format((time.time() - t) / 60))
+        print(
+            "'"
+            + func.__name__
+            + "'"
+            + " took {:.2f} minute ".format((time.time() - t) / 60)
+        )
         print("-" * 10)
         return result
 
@@ -126,7 +129,7 @@ def find_class_in_module(module_name, class_name):
         return None
 
 
-def initialize_class(module_name, class_name, **kwargs):
+def initialize_class(module_name,class_name, **kwargs):
     """
     根据给定的类名初始化类的实例对象。
 
@@ -145,26 +148,3 @@ def initialize_class(module_name, class_name, **kwargs):
         return class_obj(**kwargs)
     else:
         raise ValueError(f"Class '{class_name}' not found in the 'dynamics' module.")
-
-
-def to_pickle(thing, path):  # save something
-    with open(path, "wb") as handle:
-        pickle.dump(thing, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def from_pickle(path):  # load something
-    thing = None
-    with open(path, "rb") as handle:
-        thing = pickle.load(handle)
-    return thing
-
-
-def save_config(config, logger):
-    keys_values_pairs = []  # List to store attribute-name and attribute-value pairs
-    for attr_name in dir(config):
-        if not attr_name.startswith("__"):  # Exclude private attributes
-            attr_value = getattr(config, attr_name)  # Get the attribute value
-            keys_values_pairs.append("{}: {}".format(attr_name, attr_value))  # Store the pair
-    # Join the attribute-name and attribute-value pairs with newline separator
-    full_output = "\n".join(keys_values_pairs)
-    logger.debug("Config values:\n%s", full_output)

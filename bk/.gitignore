@@ -1,0 +1,28 @@
+# idea
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# osx
+.DS_Store
+
+# dir
+outputs/
+training_file/
+*.ipynb_checkpoints/
+
+# file
+*.pyc
+*.txt
+*.pkl
+*.tar
+*.jpg
+*.png
+*.pdf
+*.npy
+*.gif
+*.mp4
+*.log
+*.mat
+*.json

@@ -2,8 +2,6 @@ import logging
 import os
 
 
-
-    
 class Logger(logging.Logger):
     '''Inherit from logging.Logger.
     Print logs to console and file.
