@@ -26,3 +26,5 @@ training_file/
 *.log
 *.mat
 *.json
+# *.tar
+# *.pkl
