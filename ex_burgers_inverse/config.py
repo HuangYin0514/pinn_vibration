@@ -5,8 +5,8 @@ import os
 # config.py
 ########################################################################
 # For general settings
-taskname = "burgers_task"
-seed = 2068
+taskname = "burgers_inverse_task"
+seed = 0
 device = "cuda" if torch.cuda.is_available() else "cpu"
 dtype = torch.float32  # torch.float32 / torch.double
 
@@ -29,7 +29,7 @@ print_every = 500
 BackboneNet_input_dim = 2
 BackboneNet_hidden_dim = 20
 BackboneNet_output_dim = 1
-BackboneNet_layers_num = 8
+BackboneNet_layers_num = 5
 
 
 

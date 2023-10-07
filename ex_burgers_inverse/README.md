@@ -1,4 +1,4 @@
-# 求解 Burgers 方程
+# 求解 Burgers 方程反问题
 
 
 ## 引言
@@ -27,16 +27,20 @@
 - 结果文件[infer](analysis/infer.ipynb)
 - 结果
 
-    Train completion time: 2023-10-05-14-18-08
-    Task name: burgers_task
+    Train completion time: 2023-10-06-13-31-59
+    Task name: burgers_inverse_task
     Model name: PINN
-    Best model at iteration: 4246
-    Train loss: 5.829e-06
-    Val loss: 5.138e-06
+    Best model at iteration: 4239
+    Train loss: 1.178e-04
+    Val loss: 8.856e-07
 
     ![loss_curve](figures/loss_curve.png)
-    ![Burgers_results](figures/Burgers_results.png)
+    ![Burgers_results](figures/Burgers_inverse_results.png)
+
+    2023-10-06 14:26:08 INFO pred nu is 0.003180548781529069
+
+    2023-10-06 14:26:08 INFO True nu is 0.003183098861837907
 
 ## 总结
 
-- None
+- 提高数据损失的权重，数据权重30，方程权重1。

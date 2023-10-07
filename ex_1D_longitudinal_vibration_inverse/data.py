@@ -31,21 +31,22 @@ from utils import from_pickle, timing, to_pickle
 ################################################################
 def generate_train_dataset(config, logger):
     N_u = 100
-    N_f = 10000
+    N_f = 1000
 
     # read data from file --------------------------------
-    path = "/home/lbu/project/pinn_vibration/ex_burgers/dataset/burgers_shock.mat"
-    data = scipy.io.loadmat(path)
+    path = "/home/lbu/project/pinn_vibration/ex_1D_longitudinal_vibration/dataset/data_1D_longitudinal_vibration.pkl"
+    data = from_pickle(path)
 
     t = data["t"].flatten()[:, None]
     x = data["x"].flatten()[:, None]
     Exact = np.real(data["usol"])
-    T, X = np.meshgrid(t, x)  # (256, 100)
 
-    X_star = np.hstack((X.flatten()[:, None], T.flatten()[:, None]))
+    T, X = np.meshgrid(t, x)  # (256, 100)
+    X_star = np.hstack((T.flatten()[:, None], X.flatten()[:, None]))
     u_star = Exact.flatten()[:, None]
 
     # data --------------------------------
+    # bc and ic
     ic_x = np.hstack((T[:, 0:1], X[:, 0:1]))
     ic_value = Exact[:, 0:1]
     bc_low_x = np.hstack((T[0:1, :].T, X[0:1, :].T))
@@ -56,19 +57,17 @@ def generate_train_dataset(config, logger):
     X_data = np.vstack([ic_x, bc_low_x, bc_up_x])
     U_data = np.vstack([ic_value, bc_low_value, bc_up_value])
 
-    idx = np.random.choice(X_data.shape[0], N_u, replace=False)
-    X_data = X_data[idx, :]
-    U_data = U_data[idx, :]
-
-    # inner points
-    # TODO: add data points to train
+    # inner point
+    inner_X_data = X_star[::5, :]
+    inner_U_data = u_star[::5, :]
+    X_data = np.vstack((inner_X_data, X_data))
+    U_data = np.vstack((inner_U_data, U_data))
 
     # physics --------------------------------
     lb = X_star.min(0)
     ub = X_star.max(0)
     X_physics = lb + (ub - lb) * lhs(2, N_f)
-    new_X_physics = np.concatenate([X_physics[:, 1:2], X_physics[:, 0:1]], axis=-1)  # seed的bug
-    X_physics = np.vstack((new_X_physics, X_data))
+    X_physics = np.vstack((X_physics, X_data))
     U_physics = np.zeros((X_physics.shape[0], 1))
 
     # to tensor ------------------------------
@@ -82,13 +81,13 @@ def generate_train_dataset(config, logger):
 
 def generate_eval_dataset(config, logger):
     # read data from file --------------------------------
-    path = "/home/lbu/project/pinn_vibration/ex_burgers/dataset/burgers_shock.mat"
-    data = scipy.io.loadmat(path)
+    path = "/home/lbu/project/pinn_vibration/ex_1D_longitudinal_vibration/dataset/data_1D_longitudinal_vibration.pkl"
+    data = from_pickle(path)
 
     t = data["t"].flatten()[:, None]
     x = data["x"].flatten()[:, None]
     Exact = np.real(data["usol"])
-    T, X = np.meshgrid(t, x)  # (256, 100)
+    T, X = np.meshgrid(t, x)
 
     X_star = np.hstack((T.flatten()[:, None], X.flatten()[:, None]))
     u_star = Exact.flatten()[:, None]
@@ -105,16 +104,10 @@ def get_data(config, logger):
     train_data = None
 
     path = config.dataset_path
-    # path = os.path.join(config.dataset_path, "burgers-dataset.pkl")
-
-    # if os.path.exists(path):
-    #     train_data = from_pickle(path)
-    #     logger.info("Dataset loaded at: {}".format(path))
-    #     return train_data
 
     train_data = generate_train_dataset(config, logger)
     eval_data = generate_eval_dataset(config, logger)
-    # to_pickle(train_data, path)
+
     logger.info("Dataset generated at: {}".format(path))
 
     # Log the configuration and dataset generation completion

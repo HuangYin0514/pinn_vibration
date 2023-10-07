@@ -5,7 +5,7 @@ import os
 # config.py
 ########################################################################
 # For general settings
-taskname = "burgers_task"
+taskname = "task_1D_longitudinal_vibration"
 seed = 2068
 device = "cuda" if torch.cuda.is_available() else "cpu"
 dtype = torch.float32  # torch.float32 / torch.double

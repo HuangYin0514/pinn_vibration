@@ -5,7 +5,7 @@ import os
 # config.py
 ########################################################################
 # For general settings
-taskname = "burgers_task"
+taskname = "task_1D_lateral_vibration"
 seed = 2068
 device = "cuda" if torch.cuda.is_available() else "cpu"
 dtype = torch.float32  # torch.float32 / torch.double
@@ -20,8 +20,8 @@ outputs_path = os.path.join(current_directory, outputs_dir)
 ########################################################################
 # For training settings
 learning_rate = 1e-3
-iterations = 5000
-LBFGS_iterations = 4000
+iterations = 7000
+LBFGS_iterations = 5000
 print_every = 500
 
 ########################################################################
@@ -29,7 +29,7 @@ print_every = 500
 BackboneNet_input_dim = 2
 BackboneNet_hidden_dim = 20
 BackboneNet_output_dim = 1
-BackboneNet_layers_num = 8
+BackboneNet_layers_num = 5
 
 
 

@@ -72,6 +72,13 @@ class PINN(nn.Module):
 
         self.backboneNet = BackboneNet(config, logger)
 
+        self.nu = torch.nn.Parameter(
+            0.01
+            * torch.randn(
+                1,
+            )
+        )
+
     def forward(self, t, x):
         out = self.backboneNet(torch.cat([t, x], dim=-1))
         return out
@@ -83,7 +90,7 @@ class PINN(nn.Module):
         u_x = torch.autograd.grad(u, x, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
         u_xx = torch.autograd.grad(u_x, x, grad_outputs=torch.ones_like(u_x), retain_graph=True, create_graph=True)[0]
 
-        f = u_t + u * u_x - nu * u_xx
+        f = u_t + u * u_x - self.nu * u_xx
         return f
 
     def criterion(self, data):
@@ -98,7 +105,7 @@ class PINN(nn.Module):
         f_data_hat = self.net_f(t, x)
         loss_f_data = torch.mean((f_data_hat - U_physics) ** 2)
 
-        return loss_U_data + loss_f_data
+        return 30*loss_U_data + loss_f_data
 
     def eval(self, data):
         X_data, U_data = data
@@ -107,5 +114,6 @@ class PINN(nn.Module):
         U_data_hat = self(t, x)
 
         error = torch.mean((U_data_hat - U_data) ** 2)
+        self.logger.info("nu is {}".format(self.nu.item()))
 
         return U_data_hat, error

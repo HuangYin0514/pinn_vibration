@@ -34,13 +34,13 @@ def generate_train_dataset(config, logger):
     N_f = 10000
 
     # read data from file --------------------------------
-    path = "/home/lbu/project/pinn_vibration/ex_burgers/dataset/burgers_shock.mat"
-    data = scipy.io.loadmat(path)
+    path = "/home/lbu/project/pinn_vibration/ex_1D_longitudinal_vibration/dataset/data_1D_longitudinal_vibration.pkl"
+    data = from_pickle(path)
 
     t = data["t"].flatten()[:, None]
     x = data["x"].flatten()[:, None]
     Exact = np.real(data["usol"])
-    T, X = np.meshgrid(t, x)  # (256, 100)
+    T, X = np.meshgrid(t, x)  
 
     X_star = np.hstack((X.flatten()[:, None], T.flatten()[:, None]))
     u_star = Exact.flatten()[:, None]
@@ -61,7 +61,13 @@ def generate_train_dataset(config, logger):
     U_data = U_data[idx, :]
 
     # inner points
-    # TODO: add data points to train
+    # X_star = np.hstack((T.flatten()[:, None], X.flatten()[:, None]))
+    # u_star = Exact.flatten()[:, None]
+    # X_data = np.vstack((X_star, X_data))
+    # U_data = np.vstack((U_data, u_star))
+    # X_data = np.hstack((T.flatten()[:, None], X.flatten()[:, None]))
+    # U_data = Exact.flatten()[:, None]
+  
 
     # physics --------------------------------
     lb = X_star.min(0)
@@ -82,13 +88,13 @@ def generate_train_dataset(config, logger):
 
 def generate_eval_dataset(config, logger):
     # read data from file --------------------------------
-    path = "/home/lbu/project/pinn_vibration/ex_burgers/dataset/burgers_shock.mat"
-    data = scipy.io.loadmat(path)
+    path = "/home/lbu/project/pinn_vibration/ex_1D_longitudinal_vibration/dataset/data_1D_longitudinal_vibration.pkl"
+    data = from_pickle(path)
 
     t = data["t"].flatten()[:, None]
     x = data["x"].flatten()[:, None]
     Exact = np.real(data["usol"])
-    T, X = np.meshgrid(t, x)  # (256, 100)
+    T, X = np.meshgrid(t, x)  
 
     X_star = np.hstack((T.flatten()[:, None], X.flatten()[:, None]))
     u_star = Exact.flatten()[:, None]
@@ -105,7 +111,6 @@ def get_data(config, logger):
     train_data = None
 
     path = config.dataset_path
-    # path = os.path.join(config.dataset_path, "burgers-dataset.pkl")
 
     # if os.path.exists(path):
     #     train_data = from_pickle(path)

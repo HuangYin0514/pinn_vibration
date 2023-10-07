@@ -72,18 +72,34 @@ class PINN(nn.Module):
 
         self.backboneNet = BackboneNet(config, logger)
 
+        self.alpha = torch.nn.Parameter(
+            0.01
+            * torch.randn(
+                1,
+            )
+        )
+
     def forward(self, t, x):
-        out = self.backboneNet(torch.cat([t, x], dim=-1))
+        out = self.backboneNet(torch.cat([x, t], dim=-1))
         return out
 
-    def net_f(self, t, x, nu=0.01 / np.pi):
+    def net_f(self, t, x, alpha=1.0):
         u = self(t, x)
 
         u_t = torch.autograd.grad(u, t, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
+        u_tt = torch.autograd.grad(u_t, t, grad_outputs=torch.ones_like(u_t), retain_graph=True, create_graph=True)[0]
         u_x = torch.autograd.grad(u, x, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
         u_xx = torch.autograd.grad(u_x, x, grad_outputs=torch.ones_like(u_x), retain_graph=True, create_graph=True)[0]
+        u_xxx = torch.autograd.grad(u_xx, x, grad_outputs=torch.ones_like(u_xx), retain_graph=True, create_graph=True)[
+            0
+        ]
+        u_xxxx = torch.autograd.grad(
+            u_xxx, x, grad_outputs=torch.ones_like(u_xxx), retain_graph=True, create_graph=True
+        )[0]
 
-        f = u_t + u * u_x - nu * u_xx
+        alpha_pred = 2 * (torch.tanh(self.alpha) + 1)
+        # alpha_pred = 2 * (torch.tanh(torch.tensor(1, device=self.config.device)) + 1)
+        f = u_tt + alpha_pred * u_xxxx
         return f
 
     def criterion(self, data):
@@ -97,8 +113,8 @@ class PINN(nn.Module):
         x = X_physics[:, 1:2]
         f_data_hat = self.net_f(t, x)
         loss_f_data = torch.mean((f_data_hat - U_physics) ** 2)
-
-        return loss_U_data + loss_f_data
+        self.logger.debug("alpha111 is {}".format(self.alpha.item()))
+        return 30 * loss_U_data + loss_f_data
 
     def eval(self, data):
         X_data, U_data = data
@@ -107,5 +123,6 @@ class PINN(nn.Module):
         U_data_hat = self(t, x)
 
         error = torch.mean((U_data_hat - U_data) ** 2)
+        self.logger.info("alpha is {}".format(self.alpha.item()))
 
         return U_data_hat, error

@@ -1,0 +1,64 @@
+# 求解 Burgers 方程反问题
+
+
+## 引言
+
+- 1D lateral vibration 方程信息
+  
+  $$ 
+  \begin{aligned}
+
+      & \frac{\partial^{2}u}{\partial t^{2}}=\alpha^{2}\frac{\partial^{2}u}{\partial x^{2}} ,\quad x\in[0,1],\quad t\in[0,1],  \\
+
+      & u(0,x)=\sin(\pi x), \\
+
+      & u(t,0)=u(t,1)=0.
+
+  \end{aligned}
+  $$
+  其中，$\alpha=1.0$。
+
+- 方程解图像
+  
+  ![Alt text](figures/equation_physics.jpg)
+  ![Alt text](figures/equation_solution.jpg)
+
+- 解析解
+
+  $$ 
+  \begin{aligned}
+
+      & u = \text{sin}(\pi x) \text{cos}(\pi t)
+
+  \end{aligned}
+  $$
+
+## 方法
+
+- PINN求解 1D longitudinal vibration 方程
+
+- 训练文件[shell](run.sh)
+    
+## 结果
+
+- 结果文件[infer](analysis/infer.ipynb)
+- 结果
+
+    Train completion time: 2023-10-06-14-50-16
+    Task name: task_1D_longitudinal_vibration
+    Model name: PINN
+    Best model at iteration: 4155
+    Train loss: 1.334e-04
+    Val loss: 3.534e-06
+    
+    ![Alt text](figures/loss_curve.png)
+    ![Alt text](figures/1D_longitudinal_vibration_result.png)
+
+    2023-10-06 14:54:23 INFO pred alpha is -1.0001463890075684
+
+    2023-10-06 14:54:23 INFO True nu is 1.0
+
+
+## 总结
+
+- None
