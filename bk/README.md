@@ -1,1 +1,0 @@
-# pinn for dae
